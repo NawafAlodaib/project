@@ -1,0 +1,34 @@
+import javax.swing.*;
+import java.awt.*;
+import java.io.File;
+
+public class PhotoViewer extends JFrame {
+
+    public PhotoViewer(LL<Photo> photos) {
+        setTitle("Photo Viewer");
+        setSize(800, 600);
+        setLayout(new FlowLayout());
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        LL<Photo>.Node curr = photos.getHead();
+        while (curr != null) {
+            File f = new File(curr.data.getPath());
+            if (!f.exists()) {
+                curr = curr.next;
+                continue;
+            }
+
+            ImageIcon icon = new ImageIcon(curr.data.getPath());
+            Image img = icon.getImage();
+            Image scaledImg = img.getScaledInstance(200, 200, Image.SCALE_SMOOTH);
+            icon = new ImageIcon(scaledImg);
+
+            JLabel label = new JLabel(icon);
+            add(label);
+
+            curr = curr.next;
+        }
+
+        setVisible(true);
+    }
+}
