@@ -1,0 +1,58 @@
+public class LL<T> {
+    public class Node {
+        T data;
+        Node next;  
+
+        Node(T data) {
+        	this.data = data; }
+    }
+
+    private Node head;
+
+    public LL() {
+        head = null;
+    }
+
+    public void insert(T data) {
+        Node newNode = new Node(data);
+        if (head == null) head = newNode;
+        else {
+            Node curr = head;
+            while (curr.next != null) curr = curr.next;
+            curr.next = newNode;
+        }
+    }
+
+    public boolean contains(T data) {
+        Node curr = head;
+        while (curr != null) {
+            if (curr.data.equals(data)) return true;
+            curr = curr.next;
+        }
+        return false;
+    }
+
+    public void remove(T data) {
+        if (head == null) return;
+        if (head.data.equals(data)) {
+            head = head.next;
+            return;
+        }
+        Node curr = head;
+        while (curr.next != null) {
+            if (curr.next.data.equals(data)) {
+                curr.next = curr.next.next;
+                return;
+            }
+            curr = curr.next;
+        }
+    }
+
+    public boolean isEmpty() {
+        return head == null;
+    }
+
+    public Node getHead() {
+        return head;
+    }
+}
