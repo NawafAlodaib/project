@@ -1,0 +1,63 @@
+public class InvIndexPhotoManager {
+    private BST invertedIndex; 
+    private LL<Photo> allPhotos;
+
+    public InvIndexPhotoManager() {
+        invertedIndex = new BST();
+        allPhotos = new LL<>();
+    }
+
+    public void addPhoto(Photo p) {
+        allPhotos.insert(p);  // insert it in allphotos LL
+
+        LL<String>.Node tagNode = p.getTags().getHead(); 
+        while (tagNode != null) {
+            String tag = tagNode.data;
+            LL<Photo> photoList = invertedIndex.search(tag);
+
+            if (photoList == null) {// didnt find photo 
+                photoList = new LL<>();
+                invertedIndex.insert(tag, photoList); // insert in BST //and create new tag and empty LL of photo
+            }
+            photoList.insert(p); //insert the photo in LL for this tag
+            tagNode = tagNode.next; //next tag
+        }
+    }
+
+    public void deletePhoto(String path) { 
+        LL<Photo>.Node curr = allPhotos.getHead();
+        Photo target = null;
+        while (curr != null) {
+            if (curr.data.getPath().equals(path)) {
+                target = curr.data;
+                break;
+            }
+            curr = curr.next;
+        }
+
+        if (target != null) {
+            allPhotos.remove(target);
+
+            LL<String>.Node tagNode = target.getTags().getHead();
+            while (tagNode != null) {
+                String tag = tagNode.data;
+                LL<Photo> photoList = invertedIndex.search(tag);
+                if (photoList != null) {
+                    photoList.remove(target);
+                    if (photoList.isEmpty()) {
+                        invertedIndex.delete(tag);
+                    }
+                }
+                tagNode = tagNode.next;
+            }
+        }
+    }
+
+    public LL<Photo> getPhotos() {
+        return allPhotos;
+    }
+
+    public BST getInvertedIndex() {
+        return invertedIndex;
+    }
+}
