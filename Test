@@ -1,0 +1,81 @@
+import java.util.Scanner;
+
+public class Test {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Choose management method:");
+        System.out.println("1. Normal (PhotoManager)");
+        System.out.println("2. Inverted Index (InvIndexPhotoManager)");
+        System.out.print("Your choice: ");
+        int choice = scanner.nextInt();
+        scanner.nextLine();
+
+        Album album;
+        Photo photo1 = new Photo("images/download.jpg", toTagsLinkedList("animal, fox, forest, grass, green"));
+        Photo photo2 = new Photo("images/download (1).jpg", toTagsLinkedList("animal, tiger, forest, grass, green"));
+        Photo photo3 = new Photo("images/download (2).jpg", toTagsLinkedList("animal, desert, camel, sand, brown"));
+        Photo photo4 = new Photo("images/download3.jpg", toTagsLinkedList("animal, desert, db, sand, brown"));
+        Photo photo5 = new Photo("images/download4.jpg", toTagsLinkedList("animal, sea, shark, ocean, blue"));
+        Photo photo6 = new Photo("images/download5.jpg", toTagsLinkedList("animal, sea, fish, ocean, blue"));
+        Photo photo7 = new Photo("images/download6.jpg", toTagsLinkedList("insect, park, butterfly, grass, green"));
+        Photo photo8 = new Photo("images/download7.jpg", toTagsLinkedList("insect, park, bee, flower, yellow"));
+       
+
+        if (choice == 1) {
+            PhotoManager manager = new PhotoManager();
+            System.out.println("Using normal method.");
+            manager.addPhoto(photo1);
+            manager.deletePhoto(photo1.getPath()); // Delete photo1 after adding it
+            manager.addPhoto(photo2);
+            manager.addPhoto(photo3);
+            manager.addPhoto(photo4);
+            manager.addPhoto(photo5);
+            manager.addPhoto(photo6);
+            manager.addPhoto(photo7);
+            manager.addPhoto(photo8);
+          
+            album = new Album("ForestAlbum", "animal AND blue", manager);
+
+        } else {
+            InvIndexPhotoManager manager = new InvIndexPhotoManager();
+            System.out.println("Using inverted index method.");
+            manager.addPhoto(photo1);
+            manager.deletePhoto(photo1.getPath()); // Delete photo1 after adding it
+            manager.addPhoto(photo2);
+            manager.addPhoto(photo3);
+            manager.addPhoto(photo4);
+            manager.addPhoto(photo5);
+            manager.addPhoto(photo6);
+            manager.addPhoto(photo7);
+            manager.addPhoto(photo8);
+           
+            album = new Album("ForestAlbum", "animal AND blue", manager);
+        }
+
+        LL<Photo> albumPhotos = album.getPhotos();
+        System.out.println("Photos found: " + countPhotos(albumPhotos));
+       System.out.println("Tag comparisons: " + album.getNbComps());
+       
+       
+        new PhotoViewer(albumPhotos);
+    }
+
+    private static LL<String> toTagsLinkedList(String tags) {
+        LL<String> list = new LL<>();
+        String[] arr = tags.split("\\s*,\\s*");
+        for (String tag : arr) {
+            list.insert(tag); 
+        }
+        return list;
+    }
+
+    private static int countPhotos(LL<Photo> photos) {
+        int count = 0;
+        LL<Photo>.Node curr = photos.getHead();
+        while (curr != null) {
+            count++;
+            curr = curr.next;
+        }
+        return count;
+    }
+}
