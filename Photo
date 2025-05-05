@@ -1,1 +1,19 @@
+public class Photo {
+    private String path;
+    private LL<String> tags;
+
+    public Photo(String path, LL<String> tags) {
+        this.path = path;
+        this.tags = tags;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public LL<String> getTags() {
+        return tags;
+    }
+}
+
 
