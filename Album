@@ -1,0 +1,112 @@
+public class Album {
+    private String name;
+    private String condition;
+    private Object manager; //PhotoManager or InvIndexPhotoManager
+    private int nbComp;
+
+    public Album(String name, String condition, Object manager) {
+        this.name = name;
+        this.condition = condition;
+        this.manager = manager;
+    }
+
+    public LL<Photo> getPhotos() {
+        nbComp = 0;
+
+        if (condition == null || condition.isEmpty()) { //if contition=null = return all photos
+            if (manager instanceof PhotoManager) {
+                return ((PhotoManager) manager).getPhotos();    // BigO on N*M
+            } else if (manager instanceof InvIndexPhotoManager) {
+                return ((InvIndexPhotoManager) manager).getPhotos();   // BigO on NlogM 
+            }
+        }
+                                                  
+        String[] tags = condition.split("\\s*AND\\s*"); //return photos if condition = AND //and create Array of tags 
+    
+
+        if (manager instanceof PhotoManager) {
+            return getPhotosLinear(((PhotoManager) manager).getPhotos(), tags);
+        } else if (manager instanceof InvIndexPhotoManager) {
+            return getPhotosFromIndex(((InvIndexPhotoManager) manager), tags);
+        }
+
+        return new LL<>(); //if manger= null return empty LL
+    }
+
+    private LL<Photo> getPhotosLinear(LL<Photo> photos, String[] tags) {  //get photos linear for PhotoManager
+        LL<Photo> result = new LL<>();                                    // BigO on N*M
+        LL<Photo>.Node curr = photos.getHead();
+        while (curr != null) {
+            boolean find = true;
+            for (int i = 0; i < tags.length; i++) {   
+                String tag = tags[i]; 
+               nbComp++;
+                if (!containsIgnoreCase(curr.data.getTags(), tag)) { //use contiains ignore case 
+                    find = false;
+                 
+                }
+            }
+            if (find) result.insert(curr.data); //insert in result LL
+            curr = curr.next;
+        }
+        return result;  //return result LL
+    }
+    
+    private LL<Photo> getPhotosFromIndex(InvIndexPhotoManager manager, String[] tags) { //get photos from index for InvIndexPhotoManager
+        LL<Photo> result = new LL<>();                                                  // NlogM
+        if (tags.length == 0) return result;
+        
+        BST index = manager.getInvertedIndex();
+        
+        LL<Photo> base = index.search(tags[0]); 
+        if (base == null) return result;  
+
+        LL<Photo>.Node curr = base.getHead();
+        
+        while (curr != null) {
+            boolean find = true;
+
+            for (int i = 1; i < tags.length; i++) {
+                nbComp++;
+
+                if (!containsPhoto(index.search(tags[i]), curr.data)) {  
+                    find = false;
+                  
+                }
+            }
+
+            if (find) result.insert(curr.data); //insert if this photo has all the tags
+            curr = curr.next; //next photo
+        }
+        return result;
+    }
+    
+    
+
+    private boolean containsIgnoreCase(LL<String> tagsList, String target) { //if LL contains this tag true else false ignore case
+        LL<String>.Node node = tagsList.getHead();
+        while (node != null) {
+            if (node.data.equalsIgnoreCase(target)) return true;
+            node = node.next;
+        }
+        return false;
+    }
+
+    private boolean containsPhoto(LL<Photo> list, Photo target) {  // if LL contains this photo true else false  
+        if (list == null) return false;
+        LL<Photo>.Node node = list.getHead();
+        while (node != null) {
+            if (node.data.getPath().equals(target.getPath())) return true;
+            node = node.next;
+        }
+        return false;
+    }
+
+    public int getNbComps() { //return number of comparisons
+        return nbComp;
+    }
+
+    public String getName() { return name; }
+    public String getCondition() { return condition; }
+    public Object getManager() { return manager; }
+}
