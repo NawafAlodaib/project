@@ -1,0 +1,26 @@
+public class PhotoManager {
+    private LL<Photo> photos;
+
+    public PhotoManager() {
+        photos = new LL<>();
+    }
+
+    public void addPhoto(Photo p) {
+        photos.insert(p);
+    }
+
+    public void deletePhoto(String path) {
+        LL<Photo>.Node curr = photos.getHead();
+        while (curr != null) {
+            if (curr.data.getPath().equals(path)) {
+                photos.remove(curr.data);
+                break;
+            }
+            curr = curr.next;
+        }
+    }
+
+    public LL<Photo> getPhotos() {
+        return photos;
+    }
+}
